@@ -1,8 +1,8 @@
 package main
 
 import (
-	"time"
 	"os"
+	"time"
 	"azureadocomms"
 
 	"log"
@@ -58,7 +58,7 @@ func main() {
 	// 		{ID: "2", Name: "Test Pipeline"},
 	// 		{ID: "3", Name: "Deploy Pipeline"},
 	// 	}
-	
+
 	// 	// Return the data as JSON
 	// 	return c.JSON(http.StatusOK, pipelines)
 	
@@ -94,19 +94,17 @@ func updateMetrics(metricsMutex *sync.RWMutex, metricsData *[]string) {
 			newData, err := azureadocomms.Call( *ado_creds )
 			// throw error in case retry did not work
 			if i == 5 {
-				log.Errorf("Error processing request. Exiting.")
+				log.Println("Error processing request. Exiting.")
 			}
 			if err != nil {
-				// exponential retry
-				retryseconds := i * i * 10
 				// handle error
-				log.Error("Error retrieving data: %v\n, retrying in %ds...", err, retryseconds)
-				time.Sleep(5 * retryseconds)
+				log.Println("Error retrieving data: %v\n, retrying in %dmin...", err, i * i)
+				time.Sleep(i * i * time.Minute)
 			}
 			// sucessful attempt
 			duration := time.Since(startTime)
 			metricsMutex.Lock()
-			metricsData = append(metricsData, "exporter_details{requestduration=\"%d\",retries=\"%d\"} 1", duration, retries )
+			// metricsData = append(metricsData, "exporter_details{requestduration=\"%d\",retries=\"%d\"} 1", duration, retries )
 			*metricsData = newData
 			metricsMutex.Unlock()
 			log.Printf("Metrics updated. Fetched %d metrics in %v\n", len(*metricsData), duration)

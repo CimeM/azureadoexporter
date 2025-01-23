@@ -1,5 +1,3 @@
-# syntax=docker/dockerfile:1
-# Azure DevOps Pipeline exporter written in go language
 FROM golang:1.23-bookworm
 
 WORKDIR /app
