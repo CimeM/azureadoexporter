@@ -98,8 +98,8 @@ func updateMetrics(metricsMutex *sync.RWMutex, metricsData *[]string) {
 			}
 			if err != nil {
 				// handle error
-				log.Println("Error retrieving data: %v\n, retrying in %dmin...", err, i * i)
-				time.Sleep(i * i * time.Minute)
+				log.Println("Error retrieving data: %v\n, retrying in %dmin...", err, i )
+				time.Sleep(1 * time.Minute)
 			}
 			// sucessful attempt
 			duration := time.Since(startTime)
