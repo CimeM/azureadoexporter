@@ -43,7 +43,31 @@ The exporter can be configured using environment variables:
 - `ADO_URL`: URL to your Azure DevOps site
 - `SCRAPE_INTERVAL`: Scrape interval in minutes (default: 5)
 
+## Queries
 
+Data is saved under `azure_devops_pipeline` and  `azure_devops_pipeline_run` collections. 
+
+Here are some examples what can be visualized in Grafana"
+
+Pipeline failure rate
+``` promql
+( count( azure_devops_pipeline_run{result="failed"} ) / (count( azure_devops_pipeline_run{result="failed"}) + count(azure_devops_pipeline_run{result="succeeded"}) ) ) * 100
+```
+
+Number of all pipelines in the project
+``` promql
+sum( azure_devops_pipeline )
+```
+
+Pipelines that ran least amount of times
+``` promql
+count( azure_devops_pipeline_run ) by (pipelinename) <= 3
+```
+
+Histogram of pipeline runs. Pleasu use `Histogram` as a graph type.
+``` promql
+count(azure_devops_pipeline_run) by (pipelinename)
+```
 
 ## Development
 
