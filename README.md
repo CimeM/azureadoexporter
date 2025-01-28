@@ -18,7 +18,7 @@ The easiest way to use the Azure DevOps Pipeline Telemetry Exporter is through o
 1. Pull the latest image:
 
 ``` bash 
-docker pull cimartindev/azureadoexporter:latest
+docker pull cimem/azureadoexporter:latest
 ```
 
 2. Run the container:
@@ -28,7 +28,7 @@ docker run --rm -p 8080:8080 \
 -e ADO_PROJECT=your-project \
 -e ADO_PERSONAL_ACCESS_TOKEN=your-personal-access-token \
 -e ADO_URL=your-ado-url \
-cimartindev/azureadoexporter:latest
+cimem/azureadoexporter:latest
 ```
 
 3. Access metrics at `http://localhost:8080/metrics`
@@ -43,10 +43,13 @@ The exporter can be configured using environment variables:
 - `ADO_URL`: URL to your Azure DevOps site
 - `SCRAPE_INTERVAL`: Scrape interval in minutes (default: 5)
 
+
+
 ## Development
 
 Prerequisites:
 - Go compiler
+- make
 - Azure DevOps account with appropriate permissions
 - ADO PersonalAccessToken
 
