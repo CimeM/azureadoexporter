@@ -66,7 +66,7 @@ count( azure_devops_pipeline_run ) by (pipelinename) <= 3
 
 Histogram of pipeline runs. Pleasu use `Histogram` as a graph type.
 ``` promql
-count(azure_devops_pipeline_run) by (pipelinename)
+count(azure_d   evops_pipeline_run) by (pipelinename)
 ```
 
 ## Development
