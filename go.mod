@@ -1,13 +1,8 @@
-module azureadoexporter
+module github.com/cimem/azureadoexporter
 
 go 1.23.5
 
-replace azureadocomms => ../azureadocomms
-
-require (
-	azureadocomms v0.0.0-00010101000000-000000000000
-	github.com/labstack/echo/v4 v4.13.3
-)
+require github.com/labstack/echo/v4 v4.13.3
 
 require (
 	github.com/labstack/gommon v0.4.2 // indirect

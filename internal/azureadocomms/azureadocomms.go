@@ -11,10 +11,10 @@ import (
 )
 
 type ADOCredentials struct {
-    Ado_url string
+    URL string
     Project string
     Organization string
-    Pat string
+    PAT string
 }
 
 type PipelineResponse struct {
@@ -64,7 +64,7 @@ func calculateDuration(createdDate, finishedDate string) (time.Duration, error) 
 // exported name Call, calls the ADO using api
 func Call(ado_cred ADOCredentials) ([]string, error) {
     url := fmt.Sprintf("%s/%s/%s/_apis/pipelines?api-version=7.0", 
-        ado_cred.Ado_url, 
+        ado_cred.URL, 
         ado_cred.Organization, 
         ado_cred.Project,
     )
@@ -75,7 +75,7 @@ func Call(ado_cred ADOCredentials) ([]string, error) {
         return nil, err
     }
     
-    req.SetBasicAuth("", ado_cred.Pat)
+    req.SetBasicAuth("", ado_cred.PAT)
     
     client := &http.Client{}
     resp, err := client.Do(req)
@@ -101,29 +101,32 @@ func Call(ado_cred ADOCredentials) ([]string, error) {
     metricsData := []string{}
     // Process the pipeline information for Prometheus
     for _, pipeline := range pipelineResp.Value {
-        metric := fmt.Sprintf(
-            "azure_devops_pipeline{id=\"%d\",name=\"%s\",revision=\"%d\"} 1\n",
-            pipeline.ID, 
-            pipeline.Name,
-            pipeline.Revision,
-        )
-        metricsData = append(metricsData, metric)
         // describe every run of the pipeline
-        runs, err := GetPipelineRuns(ado_cred, strconv.Itoa(pipeline.ID) )
+        runs, err := GetPipelineRuns(ado_cred, strconv.Itoa(pipeline.ID), pipeline.Name )
         if err != nil {
             log.Printf("Error parsing JSON:", err)
             return nil, err
         }
         // append runs metrics to the final output
         metricsData = append(metricsData, runs...)
+        
+        // insert pipeline data point
+        metric := fmt.Sprintf(
+            "azure_devops_pipeline{id=\"%d\",name=\"%s\",revision=\"%d\",runcount=\"%d\"} 1\n",
+            pipeline.ID, 
+            pipeline.Name,
+            pipeline.Revision,
+            len(runs),
+        )
+        metricsData = append(metricsData, metric)
     }
     return metricsData, nil
 }
 
-func GetPipelineRuns(ado_cred ADOCredentials, pipelineID string) ([]string, error) {
+func GetPipelineRuns(ado_cred ADOCredentials, pipelineID string, pipelineName string) ([]string, error) {
     url := fmt.Sprintf(
         "%s/%s/%s/_apis/pipelines/%s/runs?api-version=7.0",
-        ado_cred.Ado_url, 
+        ado_cred.URL, 
         ado_cred.Organization, 
         ado_cred.Project,
         pipelineID,
@@ -135,7 +138,7 @@ func GetPipelineRuns(ado_cred ADOCredentials, pipelineID string) ([]string, erro
         return nil, err
     }
     
-    req.SetBasicAuth("", ado_cred.Pat)
+    req.SetBasicAuth("", ado_cred.PAT)
     
     client := &http.Client{}
     resp, err := client.Do(req)
@@ -170,7 +173,7 @@ func GetPipelineRuns(ado_cred ADOCredentials, pipelineID string) ([]string, erro
         }
         
         metric := fmt.Sprintf(
-            "azure_devops_pipeline_run{name=\"%s\",result=\"%s\",durationinseconds=\"%.2f\",state=\"%s\",finishedDate=\"%s\",id=\"%d\", pipelineid=\"%d\"} 1",
+            "azure_devops_pipeline_run{name=\"%s\",result=\"%s\",durationinseconds=\"%.2f\",state=\"%s\",finishedDate=\"%s\",id=\"%d\", pipelineid=\"%d\", pipelinename=\"%s\"} 1",
             pipelnerun.Name,
             pipelnerun.Result,
             duration.Seconds(),
@@ -178,6 +181,7 @@ func GetPipelineRuns(ado_cred ADOCredentials, pipelineID string) ([]string, erro
             pipelnerun.FinishedDate,
             pipelnerun.ID,
             pipelnerun.Pipeline.ID,
+            pipelineName,
         )
         
         metricsData = append(metricsData, metric)
