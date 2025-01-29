@@ -1,7 +1,7 @@
 PROJECT_NAME		:= $(shell basename $(CURDIR))
 GIT_COMMIT			:= $(shell git rev-parse --short HEAD)
-GIT_TAG				:= $(shell git describe --dirty --tags --always)
-DOCKERHUB_REPO		:= "cimem"
+GIT_TAG				:= $(shell git describe --tags --always)
+DOCKERHUB_REPO		:= "cimartindev"
 #######################################
 # builds
 #######################################
@@ -30,6 +30,10 @@ image: image
 .PHONY: test
 test:
 	time go test ./...
+
+.PHONY: lint
+lint:
+	golangci-lint run
 
 #######################################
 # release assets

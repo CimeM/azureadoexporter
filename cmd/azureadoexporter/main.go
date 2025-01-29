@@ -13,7 +13,6 @@ import (
 	"github.com/cimem/azureadoexporter/internal/apihandlers"
 	"github.com/cimem/azureadoexporter/internal/metrics"
 	// "github.com/cimem/azureadoexporter/internal/azureadocomms"
-	
 )
 
 func main() {
@@ -37,14 +36,13 @@ func main() {
 	e.Logger.Fatal(e.Start(":" + httpPort))
 }
 
-
 // func main() {
 
 // 	var metricsData []string
 // 	// mutex protects the slice from writing while reading
 // 	var metricsMutex sync.RWMutex
 // 	// Start the update function in a goroutine your application starts
-	
+
 // 	// Start the update function in a goroutine
 // 	go updateMetrics(&metricsMutex, &metricsData)
 // 	// wait for the initial data
@@ -53,12 +51,12 @@ func main() {
 // 	e := echo.New()
 
 // 	e.Use(middleware.Logger())
-// 	e.Use(middleware.Recover())	
+// 	e.Use(middleware.Recover())
 // 	e.GET("/metrics", func(c echo.Context) error {
 // 		log.Println("Accessed /metrics endpoint")
 // 		metricsMutex.RLock()
 //     	defer metricsMutex.RUnlock()
-		
+
 // 		log.Printf("Serving %d metrics\n", len(metricsData))
 // 		// Use the Echo context's Response().Writer to write the metrics
 // 		for _, metric := range metricsData {
@@ -77,7 +75,7 @@ func main() {
 // 	// 		ID   string `json:"id"`
 // 	// 		Name string `json:"name"`
 // 	// 	}
-	
+
 // 	// 	// Create some sample data
 // 	// 	pipelines := []Pipeline{
 // 	// 		{ID: "1", Name: "Build Pipeline"},
@@ -87,7 +85,7 @@ func main() {
 
 // 	// 	// Return the data as JSON
 // 	// 	return c.JSON(http.StatusOK, pipelines)
-	
+
 // 	// })
 
 // 	httpPort := os.Getenv("PORT")
@@ -97,12 +95,11 @@ func main() {
 // 	log.Printf("Starting server on port %s\n", httpPort)
 // 	e.Logger.Fatal(e.Start(":" + httpPort))
 
-	
 // }
 
 // // function to update the metrics data periodically
 // func updateMetrics(metricsMutex *sync.RWMutex, metricsData *[]string) {
-	
+
 // 	ado_url := os.Getenv("ADO_URL")
 //     project := os.Getenv("ADO_PROJECT")
 //     pat := os.Getenv("ADO_PERSONAL_ACCESS_TOKEN")
@@ -127,7 +124,7 @@ func main() {
 // 				log.Println("Error retrieving data: %v\n, retrying in %dmin...", err, i )
 // 				time.Sleep(1 * time.Minute)
 // 			}
-// 			// sucessful attempt
+// 			// successful attempt
 // 			duration := time.Since(startTime)
 // 			metricsMutex.Lock()
 // 			// metricsData = append(metricsData, "exporter_details{requestduration=\"%d\",retries=\"%d\"} 1", duration, retries )
