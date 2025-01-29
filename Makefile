@@ -2,6 +2,7 @@ PROJECT_NAME		:= $(shell basename $(CURDIR))
 GIT_COMMIT			:= $(shell git rev-parse --short HEAD)
 GIT_TAG				:= $(shell git describe --tags --always)
 DOCKERHUB_REPO		:= "cimartindev"
+
 #######################################
 # builds
 #######################################
@@ -13,6 +14,7 @@ image: lint
 #######################################
 # run the image
 #######################################
+
 
 .PHONY: run
 run: run
@@ -34,7 +36,6 @@ test:
 .PHONY: lint
 lint:
 	golangci-lint run
-
 #######################################
 # release assets
 #######################################

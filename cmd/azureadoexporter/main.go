@@ -13,6 +13,7 @@ import (
 	"github.com/cimem/azureadoexporter/internal/apihandlers"
 	"github.com/cimem/azureadoexporter/internal/metrics"
 	// "github.com/cimem/azureadoexporter/internal/azureadocomms"
+
 )
 
 func main() {
@@ -36,6 +37,7 @@ func main() {
 	e.Logger.Fatal(e.Start(":" + httpPort))
 }
 
+
 // func main() {
 
 // 	var metricsData []string
@@ -56,7 +58,6 @@ func main() {
 // 		log.Println("Accessed /metrics endpoint")
 // 		metricsMutex.RLock()
 //     	defer metricsMutex.RUnlock()
-
 // 		log.Printf("Serving %d metrics\n", len(metricsData))
 // 		// Use the Echo context's Response().Writer to write the metrics
 // 		for _, metric := range metricsData {
@@ -124,7 +125,9 @@ func main() {
 // 				log.Println("Error retrieving data: %v\n, retrying in %dmin...", err, i )
 // 				time.Sleep(1 * time.Minute)
 // 			}
+
 // 			// successful attempt
+
 // 			duration := time.Since(startTime)
 // 			metricsMutex.Lock()
 // 			// metricsData = append(metricsData, "exporter_details{requestduration=\"%d\",retries=\"%d\"} 1", duration, retries )
