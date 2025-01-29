@@ -7,15 +7,15 @@ DOCKERHUB_REPO		:= "cimartindev"
 #######################################
 
 .PHONY: image
-image: image
+image: lint
 	docker build -t $(PROJECT_NAME):$(GIT_TAG) .
 
 #######################################
 # run the image
 #######################################
 
-.PHONY: image
-image: image
+.PHONY: run
+run: run
 	docker run -p 8080:8080 \
 		-e ADO_ORGANIZATION=fabrikam \
 		-e ADO_PROJECT=fabrikam-fiber-tfvc \
