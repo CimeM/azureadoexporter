@@ -1,6 +1,8 @@
 # Azure DevOps exporter
 
 
+![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/CimeM/azureadoexporter/build.yml?branch=main) ![License](https://img.shields.io/github/license/CimeM/azureadoexporter) ![GitHub release (latest by date)](https://img.shields.io/github/v/release/CimeM/azureadoexporter) [![Go Report Card](https://goreportcard.com/badge/github.com/cimem/azureadoexporter)](https://goreportcard.com/report/github.com/cimem/azureadoexporter)
+
 The Azure DevOps Pipeline Telemetry Exporter is a Prometheus exporter designed to monitor and expose metrics from Azure DevOps pipelines. It functions similarly to the Node Exporter, providing valuable insights into your pipeline performance and health.
 
 ## Features
