@@ -6,6 +6,7 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"strings"
 	"sync"
 	"time"
 )
@@ -55,29 +56,30 @@ type TimelineResponse struct {
 	Records []TimelineRecord `json:"records"`
 }
 
-// TimelineRecord represents a record in the build timeline
-type TimelineRecord struct {
-    ID           string     `json:"id"`
-    ParentID     string     `json:"parentId"`
-    Type         string     `json:"type"`
-    Name         string     `json:"name"`
-    StartTime    string     `json:"startTime"`
-    FinishTime   string     `json:"finishTime"`
-    Result       string     `json:"result"`
-    WorkerName   string     `json:"workerName"`
-    LogID        LogInfo    `json:"log"`  
-    Order        int        `json:"order"`
-    State        string     `json:"state"`
-    ErrorCount   int        `json:"errorCount"`
-    WarningCount int        `json:"warningCount"`
-}
-
 // LogInfo represents the log information in a timeline record
 type LogInfo struct {
-    ID   int    `json:"id"`
-    Type string `json:"type"`
-    URL  string `json:"url"`
+	ID   int    `json:"id"`
+	Type string `json:"type"`
+	URL  string `json:"url"`
 }
+
+// TimelineRecord represents a record in the build timeline
+type TimelineRecord struct {
+	ID           string  `json:"id"`
+	ParentID     string  `json:"parentId"`
+	Type         string  `json:"type"`
+	Name         string  `json:"name"`
+	StartTime    string  `json:"startTime"`
+	FinishTime   string  `json:"finishTime"`
+	Result       string  `json:"result"`
+	WorkerName   string  `json:"workerName"`
+	LogID        LogInfo `json:"log"`
+	Order        int     `json:"order"`
+	State        string  `json:"state"`
+	ErrorCount   int     `json:"errorCount"`
+	WarningCount int     `json:"warningCount"`
+}
+
 // FetchBuildTimeline retrieves the timeline for a specific build
 func FetchBuildTimeline(ado_cred ADOCredentials, buildID int) (TimelineResponse, error) {
 	var timeline TimelineResponse
@@ -186,6 +188,15 @@ func FetchBuilds(ado_cred ADOCredentials) ([]string, error) {
 	return allMetrics, nil
 }
 
+// escapeString escapes special characters in a string for Prometheus labels
+func escapeString(s string) string {
+	// Replace backslash first to avoid double-escaping
+	s = strings.ReplaceAll(s, "\\", "\\\\")
+	s = strings.ReplaceAll(s, "\n", "\\n")
+	s = strings.ReplaceAll(s, "\"", "\\\"") // Escape double quotes
+	return s
+}
+
 // generateMetrics processes builds and returns Prometheus-formatted metrics
 func generateMetrics(builds []BuildDetail) ([]string, error) {
 	metricsData := []string{}
@@ -216,7 +227,7 @@ func generateMetrics(builds []BuildDetail) ([]string, error) {
 			build.ID,
 			build.Status,
 			build.Result,
-			build.Definition.Name,
+			escapeString(build.Definition.Name),
 			build.Project.Name,
 			build.Repository.Name,
 			build.Repository.Type,
@@ -233,7 +244,7 @@ func generateMetrics(builds []BuildDetail) ([]string, error) {
 			queueMetric := fmt.Sprintf(
 				"azure_devops_build_queue_duration_seconds{id=\"%d\",definitionName=\"%s\",project=\"%s\"} %.2f",
 				build.ID,
-				build.Definition.Name,
+				escapeString(build.Definition.Name),
 				build.Project.Name,
 				queueDuration.Seconds(),
 			)
@@ -245,7 +256,7 @@ func generateMetrics(builds []BuildDetail) ([]string, error) {
 			buildMetric := fmt.Sprintf(
 				"azure_devops_build_duration_seconds{id=\"%d\",definitionName=\"%s\",project=\"%s\",result=\"%s\"} %.2f",
 				build.ID,
-				build.Definition.Name,
+				escapeString(build.Definition.Name),
 				build.Project.Name,
 				build.Result,
 				buildDuration.Seconds(),
@@ -312,9 +323,9 @@ func generateTimelineMetrics(builds []BuildDetail, ado_cred ADOCredentials, limi
 					workerMetric := fmt.Sprintf(
 						"azure_devops_build_worker{buildId=\"%d\",definitionName=\"%s\",project=\"%s\",workerName=\"%s\"} 1",
 						build.ID,
-						build.Definition.Name,
+						escapeString(build.Definition.Name),
 						build.Project.Name,
-						workerName,
+						escapeString(workerName),
 					)
 					mutex.Lock()
 					metricsData = append(metricsData, workerMetric)
@@ -330,9 +341,9 @@ func generateTimelineMetrics(builds []BuildDetail, ado_cred ADOCredentials, limi
 							jobMetric := fmt.Sprintf(
 								"azure_devops_job_duration_seconds{buildId=\"%d\",definitionName=\"%s\",jobName=\"%s\",workerName=\"%s\",result=\"%s\"} %.2f",
 								build.ID,
-								build.Definition.Name,
-								record.Name,
-								record.WorkerName,
+								escapeString(build.Definition.Name),
+								escapeString(record.Name),
+								escapeString(record.WorkerName),
 								record.Result,
 								jobDuration.Seconds(),
 							)
@@ -357,10 +368,10 @@ func generateTimelineMetrics(builds []BuildDetail, ado_cred ADOCredentials, limi
 							taskMetric := fmt.Sprintf(
 								"azure_devops_task_duration_seconds{buildId=\"%d\",definitionName=\"%s\",jobName=\"%s\",taskName=\"%s\",workerName=\"%s\",result=\"%s\"} %.2f",
 								build.ID,
-								build.Definition.Name,
-								jobName,
-								record.Name,
-								record.WorkerName,
+								escapeString(build.Definition.Name),
+								escapeString(jobName),
+								escapeString(record.Name),
+								escapeString(record.WorkerName),
 								record.Result,
 								taskDuration.Seconds(),
 							)
